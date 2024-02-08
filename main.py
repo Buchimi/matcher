@@ -5,7 +5,6 @@ from hungarian_algorithm import algorithm
 from typing import List
 
 
-interests = ["anime", "games", "soccer", "volleyball", "basketball", "summer"]
 class Participant(BaseModel):
     name : str
     sex : Literal["M" , "F"]
@@ -41,11 +40,6 @@ class Participant(BaseModel):
             tally += mine * theirs
         return tally
     
-mike = Participant(name="Michael", sex="M", wants="F")
-jane = Participant(name="Jane", sex="F", wants="M" )
-
-participants = [mike, Participant(name="Pelumi", sex="M", wants="F"), jane, Participant(name="Julia", sex="F", wants="M")]
-
 def divide_up_participants(all_participants : List[Participant]):
     straight_guys = list(filter(lambda participant : participant.sex == "M" ,all_participants))
     straight_girls = list(filter(lambda participant : participant.sex == "F" ,all_participants))
@@ -65,47 +59,7 @@ def equal_distribution(participants : List[Participant]):
             list2.append(participant)
     return list1, list2
 
-def matching(participants : List[Participant], interests : List[str]):
-    
-    mapping: dict[Participant , dict[str, int]] = {}
-    for participant in  participants:
-        if participant not in mapping:
-            mapping[participant] = {}
-        for interest in interests:
-            score = random.randint(1, 5)
-            mapping[participant][interest] = score
-
-    hungarian_graph = {}
-
-    for participant in participants:
-        if participant.sex == "F":
-            continue
-        hungarian_graph[participant] = {}
-
-        section = hungarian_graph[participant]
-        
-        for other_participant in participants:
-            if other_participant.sex == "M":
-                continue
-            print(other_participant)
-
-            section[other_participant] = 0
-
-            if not participant.want_eachother(other_participant) :
-                section[other_participant] = -200
-            else:
-                # They would date eachother
-                tally = 0
-                for interest in interests:
-                    tally += mapping[participant][interest] * mapping[other_participant][interest]
-                section[other_participant] = tally
-
-
-    # print(hungarian_graph)
-    result = algorithm.find_matching(hungarian_graph)
-    return result
-
-def matching_new(participants1 : List[Participant], participants2: List[Participant], 
+def matching(participants1 : List[Participant], participants2: List[Participant], 
                  interests : dict[str, dict[Participant, int]], previous_matchings : Set[FrozenSet[ Participant]], randomize = False):
     hungarian_graph = {}
     for participant in participants1:
@@ -120,17 +74,21 @@ def generate_interest_dict(interests : List[str]) -> dict[str, dict[Participant,
         res[interest] = {}
     return res
 
-st =frozenset([mike, jane])
+def _test():
+    mike = Participant(name="Michael", sex="M", wants="F")
+    jane = Participant(name="Jane", sex="F", wants="M" )
 
-previous_matchings  = set()
-previous_matchings.add(st)
-print(previous_matchings)
-guys, girls, _, __ = divide_up_participants(participants)
-interests_dict = generate_interest_dict(interests=interests)
-for i in range (1):
-    res = matching_new(guys, girls, interests=interests_dict, randomize=True, previous_matchings=previous_matchings) 
-    print(res)
-    # for matching in res:
-    #     print(matching[0])
-        # if matching[0].name == "Michael":
-        #     print("yes")
+    participants = [mike, Participant(name="Pelumi", sex="M", wants="F"), jane, Participant(name="Julia", sex="F", wants="M")]
+
+    interests = ["anime", "games", "soccer", "volleyball", "basketball", "summer"]
+
+    st =frozenset([mike, jane])
+
+    previous_matchings  = set()
+    previous_matchings.add(st)
+    print(previous_matchings)
+    guys, girls, _, __ = divide_up_participants(participants)
+    interests_dict = generate_interest_dict(interests=interests)
+    for i in range (1):
+        res = matching(guys, girls, interests=interests_dict, randomize=True, previous_matchings=previous_matchings) 
+        print(res)

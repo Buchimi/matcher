@@ -1,2 +1,4 @@
 pydantic
 hungarian_algorithm
+setuptools
+wheel

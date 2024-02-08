@@ -1,0 +1,2 @@
+pydantic
+hungarian_algorithm
